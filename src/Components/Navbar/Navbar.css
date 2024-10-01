@@ -33,6 +33,7 @@
     fill: var(--grey1);
 }
 .nav-disp-heading{
+    font-size: 12px;
     font-weight: 500;
 }
 .nav-disp-drop{
