@@ -1,5 +1,5 @@
 .list-container{
-    width: 320px;
+    width: 280px;
     margin-left: 2.5rem;
 }
 .list-container:last-child{
@@ -41,7 +41,7 @@
 
 @media (max-width: 500px) and (min-width: 300px){
     .list-container{
-        width: 280px;
+        width: 200px;
         margin-left: 1.5rem;
     }
     .list-container:last-child{
