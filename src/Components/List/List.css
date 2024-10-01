@@ -1,5 +1,5 @@
 .list-container{
-    width: 280px;
+    width: 270px;
     margin-left: 2.5rem;
 }
 .list-container:last-child{
@@ -23,7 +23,7 @@
 .list-title{
     margin-right: .65rem;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 13px;
 }
 .list-add-item{
     margin-right: .5rem;
