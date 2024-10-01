@@ -15,7 +15,7 @@
 }
 .card-id{
     color: var(--textgrey);
-    font-size: .95rem;
+    font-size: 14px;
     font-weight: 500;
 }
 .card-profile{
@@ -48,7 +48,7 @@
     background-color: rgb(72, 223, 12);
 }
 .card-title{
-    font-size: 1rem;
+    font-size: 15px;
     font-weight: 600;
     color: var(--black1);
 
@@ -60,7 +60,7 @@
 }
 .card-tag-icon{
     border: 1px solid var(--grey1);
-    border-radius: .3rem;
+    border-radius: 10px;
     width: fit-content;
     height: 25px;
     display: flex;
