@@ -105,7 +105,7 @@ function App() {
   }
 
   return (
-    <>
+    <div>
       <Navbar
         groupValue={groupValue}
         orderValue={orderValue}
@@ -160,7 +160,7 @@ function App() {
           )}
         </div>
       </section>
-    </>
+    </div>
   );
 }
 

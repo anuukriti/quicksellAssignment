@@ -20,6 +20,7 @@
   overflow-x: scroll;
 }
 .board-details-list{
-  width: fit-content;
+  width: 100%;
   display: flex;
+  justify-content: center;
 }
