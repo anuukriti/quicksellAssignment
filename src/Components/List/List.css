@@ -38,6 +38,9 @@
 .list-card-items{
     width: 100%;
 }
+.list-sum{
+    font-size: 12px;
+}
 
 @media (max-width: 500px) and (min-width: 300px){
     .list-container{
