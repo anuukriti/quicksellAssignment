@@ -24,6 +24,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  //order
   const orderDataByValue = useCallback((cardsArray) => {
     return [...cardsArray].sort((a, b) => {
       if (orderValue === 'priority') return b.priority - a.priority;
@@ -34,6 +35,7 @@ function App() {
     });
   }, [orderValue]);
 
+  //fetching data
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(groupValue));
 
@@ -59,6 +61,7 @@ function App() {
 
     fetchData();
   }, [groupValue, orderDataByValue]);
+
 
   const handleGroupValue = useCallback((value) => {
     setGroupValue(value);

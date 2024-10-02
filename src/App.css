@@ -22,4 +22,6 @@
 .board-details-list{
   width: fit-content;
   display: flex;
+  padding-left: 5px;
+  padding-right: 5px;
 }
