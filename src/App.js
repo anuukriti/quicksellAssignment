@@ -1,108 +1,97 @@
-import React, { useEffect, useState, useCallback } from 'react';
-
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import './App.css';
-
 import List from './Components/List/List';
 import Navbar from './Components/Navbar/Navbar';
 
-function App() {
-  const statusList = ['Backlog', 'Todo', 'In progress', 'Done', 'Cancelled'];
-  const userList = ['Anoop sharma', 'Yogesh', 'Shankar Kumar', 'Ramesh', 'Suresh'];
-  const priorityList = [
-    { name: 'No priority', priority: 0 },
-    { name: 'Urgent', priority: 4 },
-    { name: 'High', priority: 3 },
-    { name: 'Medium', priority: 2 },
-    { name: 'Low', priority: 1 },
-  ];
+const STATUS_LIST = ['Backlog', 'Todo', 'In progress', 'Done', 'Cancelled'];
+const USER_LIST = ['Anoop sharma', 'Yogesh', 'Shankar Kumar', 'Ramesh', 'Suresh'];
+const PRIORITY_LIST = [
+  { name: 'No priority', priority: 0 },
+  { name: 'Low', priority: 1 },
+  { name: 'Medium', priority: 2 },
+  { name: 'High', priority: 3 },
+  { name: 'Urgent', priority: 4 },
+];
 
-  const [groupValue, setGroupValue] = useState(getStateFromLocalStorage() || 'status');
+const LOCAL_STORAGE_KEY = 'groupValue';
+
+function App() {
+  const [groupValue, setGroupValue] = useState(() => 
+    JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || 'status'
+  );
   const [orderValue, setOrderValue] = useState('title');
   const [ticketDetails, setTicketDetails] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const orderDataByValue = useCallback(
-    (cardsArray) => {
-      const sortedArray = [...cardsArray];
-
-      if (orderValue === 'priority') {
-        sortedArray.sort((a, b) => b.priority - a.priority);
-      } else if (orderValue === 'title') {
-        sortedArray.sort((a, b) => {
-          const titleA = a.title.toLowerCase();
-          const titleB = b.title.toLowerCase();
-
-          if (titleA < titleB) return -1;
-          if (titleA > titleB) return 1;
-          return 0;
-        });
+  const orderDataByValue = useCallback((cardsArray) => {
+    return [...cardsArray].sort((a, b) => {
+      if (orderValue === 'priority') return b.priority - a.priority;
+      if (orderValue === 'title') {
+        return a.title.toLowerCase().localeCompare(b.title.toLowerCase());
       }
-
-      setTicketDetails(sortedArray);
-    },
-    [orderValue]
-  );
-
-  function saveStateToLocalStorage(state) {
-    localStorage.setItem('groupValue', JSON.stringify(state));
-  }
-
-  function getStateFromLocalStorage() {
-    const storedState = localStorage.getItem('groupValue');
-    return storedState ? JSON.parse(storedState) : null;
-  }
+      return 0;
+    });
+  }, [orderValue]);
 
   useEffect(() => {
-    saveStateToLocalStorage(groupValue);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(groupValue));
 
-    async function fetchData() {
+    const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
         const response = await fetch('https://api.quicksell.co/v1/internal/frontend-assignment');
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
-        await refactorData(data);
-        console.log(data);
+        const ticketArray = data.tickets.map(ticket => ({
+          ...ticket,
+          userObj: data.users.find(user => user.id === ticket.userId)
+        })).filter(ticket => ticket.userObj);
+        setTicketDetails(orderDataByValue(ticketArray));
       } catch (err) {
         console.error('Failed to fetch data:', err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
-    }
-
-    async function refactorData(data) {
-      let ticketArray = [];
-      if (data && data.tickets && data.users && data.tickets.length > 0 && data.users.length > 0) {
-        data.tickets.forEach((ticket) => {
-          const user = data.users.find((user) => user.id === ticket.userId);
-          if (user) {
-            const ticketWithUser = { ...ticket, userObj: user };
-            ticketArray.push(ticketWithUser);
-          }
-        });
-      }
-      orderDataByValue(ticketArray);
-    }
+    };
 
     fetchData();
-  }, [orderDataByValue, groupValue]);
+  }, [groupValue, orderDataByValue]);
 
-  function handleGroupValue(value) {
+  const handleGroupValue = useCallback((value) => {
     setGroupValue(value);
-    console.log('Group Value Changed:', value);
-  }
+  }, []);
 
-  function handleOrderValue(value) {
+  const handleOrderValue = useCallback((value) => {
     setOrderValue(value);
-    console.log('Order Value Changed:', value);
-  }
+  }, []);
+
+  const renderLists = useMemo(() => {
+    if (loading) return <p>Loading tickets...</p>;
+    if (error) return <p className="error">Error: {error}</p>;
+
+    const listMap = {
+      status: STATUS_LIST,
+      user: USER_LIST,
+      priority: PRIORITY_LIST.map(item => item.priority)
+    };
+
+    return listMap[groupValue]?.map(listItem => (
+      <List
+        key={listItem}
+        groupValue={groupValue}
+        orderValue={orderValue}
+        listTitle={listItem}
+        listIcon=""
+        statusList={STATUS_LIST}
+        userList={USER_LIST}
+        priorityList={PRIORITY_LIST}
+        ticketDetails={ticketDetails}
+      />
+    ));
+  }, [groupValue, orderValue, ticketDetails, loading, error]);
 
   return (
     <div>
@@ -114,50 +103,7 @@ function App() {
       />
       <section className="board-details">
         <div className="board-details-list">
-          {loading && <p>Loading tickets...</p>}
-          {error && <p className="error">Error: {error}</p>}
-          {!loading && !error && (
-            <>
-              {groupValue === 'status' &&
-                statusList.map((listItem) => (
-                  <List
-                    key={listItem}
-                    groupValue="status"
-                    orderValue={orderValue}
-                    listTitle={listItem}
-                    listIcon=""
-                    statusList={statusList}
-                    ticketDetails={ticketDetails}
-                  />
-                ))}
-
-              {groupValue === 'user' &&
-                userList.map((listItem) => (
-                  <List
-                    key={listItem}
-                    groupValue="user"
-                    orderValue={orderValue}
-                    listTitle={listItem}
-                    listIcon=""
-                    userList={userList}
-                    ticketDetails={ticketDetails}
-                  />
-                ))}
-
-              {groupValue === 'priority' &&
-                priorityList.map((listItem) => (
-                  <List
-                    key={listItem.priority}
-                    groupValue="priority"
-                    orderValue={orderValue}
-                    listTitle={listItem.priority}
-                    listIcon=""
-                    priorityList={priorityList}
-                    ticketDetails={ticketDetails}
-                  />
-                ))}
-            </>
-          )}
+          {renderLists}
         </div>
       </section>
     </div>
