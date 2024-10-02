@@ -23,7 +23,6 @@ export default function Card({ cardDetails }) {
   const { id, userObj, title, priority, tag } = cardDetails;
   const userImage = profileImages[userObj.name];
 
-  // Helper function to get user initials
   const getUserInitials = (name) => {
     return name
       .split(' ')
