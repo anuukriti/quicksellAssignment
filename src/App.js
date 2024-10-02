@@ -24,7 +24,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  //order
+  // order
   const orderDataByValue = useCallback((cardsArray) => {
     return [...cardsArray].sort((a, b) => {
       if (orderValue === 'priority') return b.priority - a.priority;
@@ -35,7 +35,7 @@ function App() {
     });
   }, [orderValue]);
 
-  //fetching data
+  // Fetching
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(groupValue));
 
@@ -46,10 +46,14 @@ function App() {
         const response = await fetch('https://api.quicksell.co/v1/internal/frontend-assignment');
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
-        const ticketArray = data.tickets.map(ticket => ({
-          ...ticket,
-          userObj: data.users.find(user => user.id === ticket.userId)
-        })).filter(ticket => ticket.userObj);
+
+        const ticketArray = data.tickets
+          .map(ticket => ({
+            ...ticket,
+            userObj: data.users.find(user => user.id === ticket.userId),
+          }))
+          .filter(ticket => ticket.userObj);
+        
         setTicketDetails(orderDataByValue(ticketArray));
       } catch (err) {
         console.error('Failed to fetch data:', err);
@@ -62,7 +66,6 @@ function App() {
     fetchData();
   }, [groupValue, orderDataByValue]);
 
-
   const handleGroupValue = useCallback((value) => {
     setGroupValue(value);
   }, []);
@@ -71,7 +74,7 @@ function App() {
     setOrderValue(value);
   }, []);
 
-  //render list
+  // Render list items
   const renderLists = useMemo(() => {
     if (loading) return <p>Loading tickets...</p>;
     if (error) return <p className="error">Error: {error}</p>;
@@ -79,18 +82,15 @@ function App() {
     const listMap = {
       status: STATUS_LIST,
       user: USER_LIST,
-      priority: PRIORITY_LIST.map(item => item.priority)
+      priority: PRIORITY_LIST.map(item => item.priority),
     };
 
-    return listMap[groupValue]?.map(listItem => (
+    return listMap[groupValue]?.map((listItem) => (
       <List
         key={listItem}
         groupValue={groupValue}
         orderValue={orderValue}
         listTitle={listItem}
-        listIcon=""
-        statusList={STATUS_LIST}
-        userList={USER_LIST}
         priorityList={PRIORITY_LIST}
         ticketDetails={ticketDetails}
       />
