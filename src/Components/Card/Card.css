@@ -3,7 +3,7 @@
     padding: 1rem;
     border-radius: 0.5rem;
     border: 1px solid #ccc;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Slightly improved shadow for a more modern look */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     background-color: white;
     margin-bottom: 1rem;
     cursor: pointer;
